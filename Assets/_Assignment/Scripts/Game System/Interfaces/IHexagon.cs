@@ -7,6 +7,6 @@ namespace Anonymous.Game.Hexagon
     {
         bool HasBlock();
         void SetBlock(IBlock block);
-        Vector2 GetPosition();
+        Transform GetTransform();
     }
 }

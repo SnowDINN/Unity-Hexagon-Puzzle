@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Anonymous.Game.Block
 {
-    public class GameSpawnSystem : MonoBehaviour, ISpawn
+    public class GameSpawnerSystem : MonoBehaviour, ISpawner
     {
         [SerializeField] private List<GameObject> blocks;
 
@@ -26,23 +26,26 @@ namespace Anonymous.Game.Block
 
         private IEnumerator spawnBlock_Coroutine(IHexagon hexagon)
         {
+            var first = true;
             while (true)
             {
-                if (!hexagon.HasBlock())
+                if (hexagon.HasBlock())
                 {
-                    var go = Instantiate(blocks[Random.Range(0, blocks.Count)]);
-                    var system = go.GetComponent<ISystem>();
-                    system?.Setup();
-
-                    var block = go.GetComponent<IBlock>();
-                    block?.Move(hexagon);
-                    
-                    hexagon.SetBlock(block);
-                    
-                    GameSystem.Default.EVT_BlockSpawnPublish();
+                    yield return null;
+                    continue;
                 }
+                
+                var go = Instantiate(blocks[Random.Range(0, blocks.Count)]);
+                var system = go.GetComponent<ISystem>();
+                system?.Setup();
 
-                yield return null;
+                var block = go.GetComponent<IBlock>();
+                block?.Spawn(hexagon);
+                    
+                hexagon.SetBlock(block);
+
+                yield return new WaitForSeconds(first ? 0.25f : 0.15f);
+                first = false;
             }
         }
     }

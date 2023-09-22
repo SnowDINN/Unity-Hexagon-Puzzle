@@ -1,6 +1,6 @@
 namespace Anonymous.Game.Hexagon
 {
-    public interface ISpawn
+    public interface ISpawner
     {
         void Setup();
         void Teardown();

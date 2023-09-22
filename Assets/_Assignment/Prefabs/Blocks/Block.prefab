@@ -97,4 +97,18 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c373e921322046f42a12e9f69f7c3124, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  animationSpeed: 0.5
+  blocks:
+  - type: 0
+    positions:
+    - {x: 0, y: -1}
+    - {x: 0, y: 1}
+  - type: 1
+    positions:
+    - {x: -1, y: -0.5}
+    - {x: 1, y: 0.5}
+  - type: 2
+    positions:
+    - {x: 1, y: -0.5}
+    - {x: -1, y: 0.5}
+  animationMaxSpeed: 50
+  animationVelocitySpeed: 0.5

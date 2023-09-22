@@ -1,8 +1,8 @@
 namespace Anonymous.Game
 {
-    public enum HexagonPositionType
+    public enum PositionType
     {
-        Botton,
+        Center,
         Left,
         Right,
     }

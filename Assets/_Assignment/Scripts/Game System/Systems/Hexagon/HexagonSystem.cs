@@ -12,16 +12,16 @@ namespace Anonymous.Game.Hexagon
     [Serializable]
     public class HexagonPositionModel
     {
-        public HexagonPositionType type;
+        public PositionType type;
         public Vector2 position;
     }
     
     public class HexagonSystem : MonoBehaviour, ISystem, IHexagon
     {
         [SerializeField] private List<HexagonPositionModel> hexagons;
-
-        private readonly Dictionary<HexagonPositionType, IHexagon> systems = new();
-        public IBlock Block;
+        
+        private readonly Dictionary<PositionType, IHexagon> systems = new();
+        private IBlock block;
 
         public void Setup()
         {
@@ -30,7 +30,7 @@ namespace Anonymous.Game.Hexagon
             
             foreach (var hexagon in hexagons)
             {
-                var ray = new Ray2D(calculateLocalPosition(hexagon.position), Vector2.zero);
+                var ray = new Ray2D(GameSystem.Default.CalculateLocalPosition(transform.position, hexagon.position), Vector2.zero);
                 var hit = Physics2D.Raycast(ray.origin, ray.direction);
                 if (hit.collider != null)
                     systems.Add(hexagon.type, hit.transform.GetComponent<IHexagon>());
@@ -45,17 +45,18 @@ namespace Anonymous.Game.Hexagon
         
         public bool HasBlock()
         {
-            return Block != null;
+            return transform.childCount > 0;
         }
 
         public void SetBlock(IBlock block)
         {
-            Block = block;
+            this.block = block;
+            Movement();
         }
 
-        public Vector2 GetPosition()
+        public Transform GetTransform()
         {
-            return transform.position;
+            return transform;
         }
 
         private void EVT_BlockSpawn()
@@ -70,42 +71,38 @@ namespace Anonymous.Game.Hexagon
 
         private void Movement()
         {
-            foreach (var system in systems)
+            for (var i = 0; i < systems.Count; i++)
             {
-                if (Block == null)
-                    return;
-                
-                var hexagon = system.Value;
-                if (hexagon == null)
-                    return;
-                
-                if (!hexagon.HasBlock())
-                {
-                    hexagon.SetBlock(Block);
-                    
-                    Block.Move(hexagon);
-                    Block = null;
-                    break;
-                }
-            }
-        }
+                if (block == null)
+                    continue;
 
-        private Vector2 calculateLocalPosition(Vector2 position)
-        {
-            return transform.position + new Vector3(position.x, position.y, 0);
+                var key = (PositionType)i;
+                if (!systems.ContainsKey(key))
+                    continue;
+                
+                var hexagon = systems[key];
+                if (hexagon == null)
+                    continue;
+                    
+                if (hexagon.HasBlock())
+                    continue;
+                        
+                block.Move(hexagon);
+                block = null;
+                break;
+            }
         }
         
 #if UNITY_EDITOR
         private void OnDrawGizmos()
         {
             var radius = 0.1f;
-
             if (Selection.activeGameObject == gameObject)
             {
                 Gizmos.color = Color.black;
 
                 foreach (var hexagon in hexagons)
-                    Gizmos.DrawSphere(calculateLocalPosition(hexagon.position), radius);
+                    Gizmos.DrawSphere(GameSystem.Default.CalculateLocalPosition(transform.position, hexagon.position), radius);
             }
         }
 #endif

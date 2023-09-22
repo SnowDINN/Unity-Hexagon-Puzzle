@@ -21,7 +21,7 @@ namespace Anonymous.Game
             foreach (var hexagon in systems)
                 hexagon.Setup();
             
-            var spawns = GetComponentsInChildren<ISpawn>(true);
+            var spawns = GetComponentsInChildren<ISpawner>(true);
             foreach (var spawn in spawns)
                 spawn.Setup();
         }
@@ -32,7 +32,7 @@ namespace Anonymous.Game
             foreach (var hexagon in systems)
                 hexagon.Teardown();
             
-            var spawns = GetComponentsInChildren<ISpawn>(true);
+            var spawns = GetComponentsInChildren<ISpawner>(true);
             foreach (var spawn in spawns)
                 spawn.Teardown();
         }
@@ -45,6 +45,11 @@ namespace Anonymous.Game
         public void EVT_BlockResolvePublish()
         {
             EVT_BlockResolve();
+        }
+        
+        public Vector2 CalculateLocalPosition(Vector3 a, Vector2 b)
+        {
+            return a + new Vector3(b.x, b.y, 0);
         }
     }
 }

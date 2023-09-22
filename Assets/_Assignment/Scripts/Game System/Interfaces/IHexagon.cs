@@ -1,8 +1,12 @@
+using Anonymous.Game.Block;
+using UnityEngine;
+
 namespace Anonymous.Game.Hexagon
 {
     public interface IHexagon
     {
-        void Setup();
-        void Teardown();
+        bool HasBlock();
+        void SetBlock(IBlock block);
+        Vector2 GetPosition();
     }
 }

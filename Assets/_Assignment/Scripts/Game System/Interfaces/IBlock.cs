@@ -1,8 +1,9 @@
+using Anonymous.Game.Hexagon;
+
 namespace Anonymous.Game.Block
 {
     public interface IBlock
     {
-        void Setup();
-        void Teardown();
+        void Move(IHexagon hexagon);
     }
 }

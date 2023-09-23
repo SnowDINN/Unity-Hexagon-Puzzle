@@ -1,4 +1,4 @@
-namespace Anonymous.Game.Hexagon
+namespace Anonymous.Game
 {
     public interface ISpawner
     {

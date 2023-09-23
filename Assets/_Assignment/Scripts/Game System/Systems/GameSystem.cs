@@ -1,4 +1,6 @@
 using System;
+using System.Collections.Generic;
+using Anonymous.Game.Block;
 using Anonymous.Game.Hexagon;
 using UnityEngine;
 
@@ -6,14 +8,19 @@ namespace Anonymous.Game
 {
     public class GameSystem : MonoBehaviour
     {
-        public delegate void Delegate_BlockSpawn();
-        public event Delegate_BlockSpawn EVT_BlockSpawn;
-        
-        public delegate void Delegate_BlockResolve();
-        public event Delegate_BlockResolve EVT_BlockResolve;
-
         private static GameSystem _default;
         public static GameSystem Default => _default ??= new GameSystem();
+        
+        public delegate void Delegate_BlockMovementSystem(int id, IHexagon hexagon);
+        public event Delegate_BlockMovementSystem EVT_BlockMovementSystem;
+        
+        public delegate void Delegate_BlockMatchSystem(IHexagon hexagon);
+        public event Delegate_BlockMatchSystem EVT_BlockMatchSystem;
+        
+        public delegate void Delegate_HexagonDetectSystem();
+        public event Delegate_HexagonDetectSystem EVT_HexagonDetectSystem;
+        
+        public Dictionary<BlockType, List<IBlock>> MatchedBlock = new();
 
         private void OnEnable()
         {
@@ -24,6 +31,9 @@ namespace Anonymous.Game
             var spawns = GetComponentsInChildren<ISpawner>(true);
             foreach (var spawn in spawns)
                 spawn.Setup();
+
+            foreach (var type in Enum.GetValues(typeof(BlockType)))
+                MatchedBlock.Add((BlockType)type, new List<IBlock>());
         }
 
         private void OnDisable()
@@ -37,14 +47,14 @@ namespace Anonymous.Game
                 spawn.Teardown();
         }
 
-        public void EVT_BlockSpawnPublish()
+        public void EVT_BlockMovementPublish(int id, IHexagon hexagon)
         {
-            EVT_BlockSpawn();
+            EVT_BlockMovementSystem?.Invoke(id, hexagon);
         }
         
-        public void EVT_BlockResolvePublish()
+        public void EVT_HexagonDetectSystemPublish()
         {
-            EVT_BlockResolve();
+            EVT_HexagonDetectSystem?.Invoke();
         }
         
         public Vector2 CalculateLocalPosition(Vector3 a, Vector2 b)

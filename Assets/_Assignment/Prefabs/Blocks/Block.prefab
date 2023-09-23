@@ -11,6 +11,8 @@ GameObject:
   - component: {fileID: 871077423156105210}
   - component: {fileID: 2370209250583572973}
   - component: {fileID: 8293465099160170400}
+  - component: {fileID: 1700540267593465609}
+  - component: {fileID: -8508928122536098044}
   m_Layer: 0
   m_Name: Block
   m_TagString: Untagged
@@ -73,7 +75,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 1
   m_Sprite: {fileID: 0}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -97,18 +99,43 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c373e921322046f42a12e9f69f7c3124, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  type: 0
+--- !u!114 &1700540267593465609
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4674581055203028277}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 449e36fccfff855409b490f3250a2018, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  animationMaxSpeed: 100
+  animationVelocitySpeed: 0.5
+--- !u!114 &-8508928122536098044
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4674581055203028277}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8183a93b3beb2df49a7b5da0320749f4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
   blocks:
   - type: 0
     positions:
-    - {x: 0, y: -1}
     - {x: 0, y: 1}
+    - {x: 0, y: -1}
   - type: 1
     positions:
-    - {x: -1, y: -0.5}
     - {x: 1, y: 0.5}
+    - {x: -1, y: -0.5}
   - type: 2
     positions:
-    - {x: 1, y: -0.5}
     - {x: -1, y: 0.5}
-  animationMaxSpeed: 50
-  animationVelocitySpeed: 0.5
+    - {x: 1, y: -0.5}

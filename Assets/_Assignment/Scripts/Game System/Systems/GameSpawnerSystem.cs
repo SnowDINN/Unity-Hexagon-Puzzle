@@ -1,19 +1,21 @@
+using System;
 using System.Collections;
-using System.Collections.Generic;
+using Anonymous.Game.Block;
 using Anonymous.Game.Hexagon;
 using UnityEngine;
 
-namespace Anonymous.Game.Block
+namespace Anonymous.Game
 {
     public class GameSpawnerSystem : MonoBehaviour, ISpawner
     {
-        [SerializeField] private List<GameObject> blocks;
-
+        [SerializeField] private GameObject hexagongGameObject;
+        
         private Coroutine spawn_Coroutine;
+        private int index;
 
         public void Setup()
         {
-            var hexagon = GetComponent<IHexagon>();
+            var hexagon = hexagongGameObject.GetComponent<IHexagon>();
             if (hexagon != null)
                 spawn_Coroutine = StartCoroutine(spawnBlock_Coroutine(hexagon));
         }
@@ -26,7 +28,6 @@ namespace Anonymous.Game.Block
 
         private IEnumerator spawnBlock_Coroutine(IHexagon hexagon)
         {
-            var first = true;
             while (true)
             {
                 if (hexagon.HasBlock())
@@ -34,18 +35,20 @@ namespace Anonymous.Game.Block
                     yield return null;
                     continue;
                 }
+
+                var type = (BlockType)UnityEngine.Random.Range(0, Enum.GetValues(typeof(BlockType)).Length);
+                var resouce = Resources.Load($"Block {type}") as GameObject;
+                var gameObject = Instantiate(resouce, transform.position, transform.rotation);
                 
-                var go = Instantiate(blocks[Random.Range(0, blocks.Count)]);
-                var system = go.GetComponent<ISystem>();
+                var system = gameObject.GetComponent<ISystem>();
                 system?.Setup();
 
-                var block = go.GetComponent<IBlock>();
-                block?.Spawn(hexagon);
+                var block = gameObject.GetComponent<IBlock>();
+                block?.Spawn(index++, type, hexagon);
                     
                 hexagon.SetBlock(block);
 
-                yield return new WaitForSeconds(first ? 0.25f : 0.15f);
-                first = false;
+                yield return new WaitForSeconds(0.2f);
             }
         }
     }

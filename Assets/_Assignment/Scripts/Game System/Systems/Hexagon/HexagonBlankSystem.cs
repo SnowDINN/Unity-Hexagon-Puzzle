@@ -15,7 +15,7 @@ namespace Anonymous.Game.Hexagon
         {
             this.hexagon = hexagon;
             
-            GameSystem.Default.EVT_HexagonDetectSystem += EVT_HexagonDetectSystem;
+            GameEventSystem.EVT_DetectBlankSystem += EvtDetectBlankSystem;
 
             foreach (var detectedHexagon in detectedHexagons)
             {
@@ -28,10 +28,10 @@ namespace Anonymous.Game.Hexagon
 
         public void Teardown()
         {
-            GameSystem.Default.EVT_HexagonDetectSystem -= EVT_HexagonDetectSystem;
+            GameEventSystem.EVT_DetectBlankSystem -= EvtDetectBlankSystem;
         }
         
-        private void EVT_HexagonDetectSystem()
+        private void EvtDetectBlankSystem()
         {
             Movement();
         }
@@ -53,7 +53,7 @@ namespace Anonymous.Game.Hexagon
 
                 if (hexagon.block != null)
                 {
-                    GameSystem.Default.EVT_BlockMovementPublish(hexagon.block.id, nextHexagon);
+                    nextHexagon.EVT_MovementPublish(hexagon.block.id);
                     hexagon.block = null;
                 }
                 break;

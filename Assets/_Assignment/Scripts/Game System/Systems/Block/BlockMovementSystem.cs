@@ -17,15 +17,15 @@ namespace Anonymous.Game.Block
         {
             this.block = block;
 
-            GameSystem.Default.EVT_BlockMovementSystem += EVT_BlockMovementSystem;
+            GameEventSystem.EVT_MovementSystem += EvtMovementSystem;
         }
 
         public void Teardown()
         {
-            GameSystem.Default.EVT_BlockMovementSystem -= EVT_BlockMovementSystem;
+            GameEventSystem.EVT_MovementSystem -= EvtMovementSystem;
         }
         
-        private void EVT_BlockMovementSystem(int id, IHexagon hexagon)
+        private void EvtMovementSystem(int id, IHexagon hexagon)
         {
             if (block.id == id)
                 Movement(block, hexagon);
@@ -49,8 +49,7 @@ namespace Anonymous.Game.Block
                 yield return null;
             }
             hexagon.SetBlock(block);
-
-            GameSystem.Default.EVT_HexagonDetectSystemPublish();
+            hexagon.EVT_DetectBlankSystemPublish();
         }
     }
 }

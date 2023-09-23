@@ -37,7 +37,7 @@ namespace Anonymous.Game.Block
             this.type = type;
 
             SetHexagon(hexagon);
-            GameSystem.Default.EVT_BlockMovementPublish(id, hexagon);
+            hexagon.EVT_MovementPublish(id);
         }
 
         public void SetHexagon(IHexagon hexagon)

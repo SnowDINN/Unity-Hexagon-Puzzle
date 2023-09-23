@@ -37,7 +37,7 @@ namespace Anonymous.Game.Hexagon
         public void SetBlock(IBlock block)
         {
             this.block = block;
-            GameSystem.Default.EVT_HexagonDetectSystemPublish();
+            this.EVT_DetectBlankSystemPublish();
         }
 
         public Transform GetTransform()

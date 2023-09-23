@@ -18,15 +18,15 @@ namespace Anonymous.Game.Block
         {
             this.block = block;
 
-            GameSystem.Default.EVT_BlockMatchSystem += EVT_BlockMatchSystem;
+            GameEventSystem.EVT_MatchSystem += EvtMatchSystem;
         }
 
         public void Teardown()
         {
-            GameSystem.Default.EVT_BlockMatchSystem -= EVT_BlockMatchSystem;
+            GameEventSystem.EVT_MatchSystem -= EvtMatchSystem;
         }
 
-        private void EVT_BlockMatchSystem(IHexagon hexagon)
+        private void EvtMatchSystem(IHexagon hexagon)
         {
             // Match();
         }

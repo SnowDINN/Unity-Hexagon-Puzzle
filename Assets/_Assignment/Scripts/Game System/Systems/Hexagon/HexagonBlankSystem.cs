@@ -20,7 +20,7 @@ namespace Anonymous.Game.Hexagon
                 Gizmos.color = Color.black;
 
                 foreach (var hexagon in detectedHexagons)
-                    Gizmos.DrawSphere(GameSystem.Default.CalculateLocalPosition(transform.position, hexagon.position),
+                    Gizmos.DrawSphere(transform.position.CalculateLocalPosition(hexagon.position),
                         radius);
             }
         }
@@ -35,11 +35,14 @@ namespace Anonymous.Game.Hexagon
             foreach (var detectedHexagon in detectedHexagons)
             {
                 var ray = new Ray2D(
-                    GameSystem.Default.CalculateLocalPosition(transform.position, detectedHexagon.position),
+                    transform.position.CalculateLocalPosition(detectedHexagon.position),
                     Vector2.zero);
-                var hit = Physics2D.Raycast(ray.origin, ray.direction);
-                if (hit.collider != null)
-                    systems.Add(detectedHexagon.type, hit.transform.GetComponent<IHexagon>());
+                var hit2Ds = Physics2D.RaycastAll(ray.origin, ray.direction);
+                foreach (var hit2D in hit2Ds)
+                {
+                    if (hit2D.collider != null && hit2D.collider.CompareTag("Hexagon"))
+                        systems.Add(detectedHexagon.type, hit2D.transform.GetComponent<IHexagon>());   
+                }
             }
         }
 
@@ -65,13 +68,13 @@ namespace Anonymous.Game.Hexagon
                 if (nextHexagon == null)
                     continue;
 
-                if (nextHexagon.HasBlock())
+                if (nextHexagon.hasBind)
                     continue;
 
                 if (hexagon.block != null)
                 {
                     nextHexagon.EVT_MovementPublish(hexagon.block.id);
-                    hexagon.block = null;
+                    hexagon.BindBlock(null);
                 }
 
                 break;

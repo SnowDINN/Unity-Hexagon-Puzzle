@@ -31,13 +31,18 @@ namespace Anonymous.Game.Block
             this.id = id;
             this.type = type;
 
-            SetHexagon(hexagon);
+            BindHexagon(hexagon);
             hexagon.EVT_MovementPublish(id);
         }
 
-        public void SetHexagon(IHexagon hexagon)
+        public void BindHexagon(IHexagon hexagon)
         {
-            transform.SetParent(hexagon.GetTransform());
+            transform.SetParent(hexagon.transform);
+        }
+
+        public void BindHexagonNothing()
+        {
+            transform.SetParent(transform.root);
         }
 
         public void Setup()

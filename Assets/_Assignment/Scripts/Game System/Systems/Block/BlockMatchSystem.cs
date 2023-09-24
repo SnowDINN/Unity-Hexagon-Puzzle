@@ -23,7 +23,7 @@ namespace Anonymous.Game.Block
                 Gizmos.color = Color.black;
 
                 foreach (var position in blocks.SelectMany(block => block.positions))
-                    Gizmos.DrawSphere(GameSystem.Default.CalculateLocalPosition(transform.position, position), radius);
+                    Gizmos.DrawSphere(transform.position.CalculateLocalPosition(position), radius);
             }
         }
 #endif
@@ -40,7 +40,7 @@ namespace Anonymous.Game.Block
             GameEventSystem.EVT_MatchSystem -= EVT_MatchSystem;
         }
 
-        private void EVT_MatchSystem(IHexagon hexagon)
+        private void EVT_MatchSystem()
         {
             Match();
         }
@@ -49,40 +49,41 @@ namespace Anonymous.Game.Block
         {
             foreach (var block in blocks)
             {
-                var list = new List<IHexagon>();
+                var hexagons = new List<IHexagon>();
                 foreach (var position in block.positions)
                 {
-                    var ray = new Ray2D(GameSystem.Default.CalculateLocalPosition(transform.position, position),
+                    var ray = new Ray2D(transform.position.CalculateLocalPosition(position),
                         Vector2.zero);
-                    var hit = Physics2D.Raycast(ray.origin, ray.direction);
-                    if (hit.collider != null)
-                        list.Add(hit.transform.GetComponent<IHexagon>());
+                    var hit2Ds = Physics2D.RaycastAll(ray.origin, ray.direction);
+                    foreach (var hit2D in hit2Ds)
+                    {
+                        if (hit2D.collider != null && hit2D.collider.CompareTag("Hexagon"))
+                            hexagons.Add(hit2D.transform.GetComponent<IHexagon>());   
+                    }
                 }
-
-                systems[block.type] = list;
+                
+                systems[block.type] = hexagons;
             }
 
             for (var i = 0; i < systems.Count; i++)
             {
                 var match = systems[(PositionType)i];
-                if (match.Count != 2)
+                if (match.Count != 3)
                     continue;
 
-                if (match[0].block?.type == block.type && match[1].block?.type == block.type)
-                {
-                    var blocks = new List<IBlock> { block, match[0].block, match[1].block };
-                    foreach (var block in blocks)
-                        if (block.id < 0)
-                            return;
+                if (match[0].block?.type != block.type || match[1].block?.type != block.type || match[2].block?.type != block.type)
+                    continue;
+                
+                var blocks = new List<IBlock> { match[0].block, match[1].block, match[2].block };
+                if (blocks.Any(block => block.id < 0))
+                    return;
 
-                    GameSystem.Default.MatchedBlock[block.type].AddRange(blocks);
-                }
+                GameSystem.Default.MatchedBlock[block.type].AddRange(blocks);
+                DeleteMatch(systems[(PositionType)i]);
             }
-
-            DeleteMatch();
         }
-        
-        public void DeleteMatch()
+
+        public void DeleteMatch(List<IHexagon> hexagons)
         {
             for (var type = 0; type < GameSystem.Default.MatchedBlock.Count; type++)
             {
@@ -97,7 +98,15 @@ namespace Anonymous.Game.Block
                         blocks[0].Dispose();
                     blocks.RemoveAt(0);
                 }
+
+                foreach (var hexagon in hexagons)
+                {
+                    hexagon.block.BindHexagonNothing();
+                    hexagon.BindBlock(null);
+                }
             }
+            
+            GameEventSystem.EVT_DetectBlankSystemPublish();
         }
     }
 }

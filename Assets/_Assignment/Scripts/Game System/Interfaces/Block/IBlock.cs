@@ -7,7 +7,8 @@ namespace Anonymous.Game.Block
         int id { get; set; }
         BlockType type { get; set; }
         void Spawn(int id, BlockType type, IHexagon hexagon);
-        void SetHexagon(IHexagon hexagon);
+        void BindHexagon(IHexagon hexagon);
+        void BindHexagonNothing();
         void Dispose();
     }
 }

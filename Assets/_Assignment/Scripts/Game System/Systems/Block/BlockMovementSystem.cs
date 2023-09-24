@@ -12,7 +12,7 @@ namespace Anonymous.Game.Block
         [SerializeField] private float animationVelocitySpeed;
         private IBlock block;
 
-        private Coroutine move_Coroutine;
+        private Coroutine movementBlock;
 
         public void Setup(IBlock block)
         {
@@ -34,25 +34,26 @@ namespace Anonymous.Game.Block
 
         private void Movement(IBlock block, IHexagon hexagon)
         {
-            if (move_Coroutine != null)
-                StopCoroutine(move_Coroutine);
-            move_Coroutine = StartCoroutine(movementBlock_Coroutine(block, hexagon));
+            if (movementBlock != null)
+                StopCoroutine(movementBlock);
+            movementBlock = StartCoroutine(co_movementBlock(block, hexagon));
         }
 
-        private IEnumerator movementBlock_Coroutine(IBlock block, IHexagon hexagon)
+        private IEnumerator co_movementBlock(IBlock block, IHexagon hexagon)
         {
-            block.SetHexagon(hexagon);
             var time = 0f;
+            
+            block.BindHexagon(hexagon);
             while (Vector2.Distance(transform.localPosition, Vector2.zero) > 0)
             {
                 time = Mathf.MoveTowards(time, animationMaxSpeed, Time.deltaTime * animationVelocitySpeed);
                 transform.localPosition = Vector2.MoveTowards(transform.localPosition, Vector2.zero, time);
                 yield return null;
             }
-
-            hexagon.SetBlock(block);
-            hexagon.EVT_DetectBlankSystemPublish();
-            hexagon.EVT_MatchPublish();
+            hexagon.BindBlock(block);
+            
+            GameEventSystem.EVT_DetectBlankSystemPublish();
+            GameEventSystem.EVT_MatchPublish();
         }
     }
 }

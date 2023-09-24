@@ -10,10 +10,27 @@ namespace Anonymous.Game.Hexagon
         public PositionType type;
         public Vector2 position;
     }
-    
+
     public class HexagonSystem : MonoBehaviour, ISystem, IHexagon
     {
         public IBlock block { get; set; }
+
+        public Transform transform
+        {
+            get => gameObject.transform;
+            set { }
+        }
+
+        public bool hasBind
+        {
+            get => transform.childCount > 0;
+            set { }
+        }
+
+        public void BindBlock(IBlock block)
+        {
+            this.block = block;
+        }
 
         public void Setup()
         {
@@ -27,17 +44,6 @@ namespace Anonymous.Game.Hexagon
             var hexagonSystems = GetComponentsInChildren<IHexagonSystem>(true);
             foreach (var hexagonSystem in hexagonSystems)
                 hexagonSystem.Teardown();
-        }
-
-        public bool HasBlock()
-        {
-            return transform.childCount > 0;
-        }
-
-        public void SetBlock(IBlock block)
-        {
-            this.block = block;
-            this.EVT_DetectBlankSystemPublish();
         }
 
         public Transform GetTransform()

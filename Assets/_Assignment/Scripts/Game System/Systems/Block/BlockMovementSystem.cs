@@ -6,26 +6,27 @@ namespace Anonymous.Game.Block
 {
     public class BlockMovementSystem : MonoBehaviour, IBlockSystem
     {
-        [Header("Movement Animation Field")]
-        [SerializeField] private float animationMaxSpeed;
+        [Header("Movement Animation Field")] [SerializeField]
+        private float animationMaxSpeed;
+
         [SerializeField] private float animationVelocitySpeed;
-        
-        private Coroutine move_Coroutine;
         private IBlock block;
-        
+
+        private Coroutine move_Coroutine;
+
         public void Setup(IBlock block)
         {
             this.block = block;
 
-            GameEventSystem.EVT_MovementSystem += EvtMovementSystem;
+            GameEventSystem.EVT_MovementSystem += EVT_MovementSystem;
         }
 
         public void Teardown()
         {
-            GameEventSystem.EVT_MovementSystem -= EvtMovementSystem;
+            GameEventSystem.EVT_MovementSystem -= EVT_MovementSystem;
         }
-        
-        private void EvtMovementSystem(int id, IHexagon hexagon)
+
+        private void EVT_MovementSystem(int id, IHexagon hexagon)
         {
             if (block.id == id)
                 Movement(block, hexagon);
@@ -48,8 +49,10 @@ namespace Anonymous.Game.Block
                 transform.localPosition = Vector2.MoveTowards(transform.localPosition, Vector2.zero, time);
                 yield return null;
             }
+
             hexagon.SetBlock(block);
             hexagon.EVT_DetectBlankSystemPublish();
+            hexagon.EVT_MatchPublish();
         }
     }
 }

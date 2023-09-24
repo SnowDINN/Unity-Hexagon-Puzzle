@@ -36,7 +36,7 @@ namespace Anonymous.Game
                     continue;
                 }
 
-                var type = (BlockType)UnityEngine.Random.Range(0, Enum.GetValues(typeof(BlockType)).Length);
+                var type =  (BlockType)UnityEngine.Random.Range(0, Enum.GetValues(typeof(BlockType)).Length);
                 var resouce = Resources.Load($"Block {type}") as GameObject;
                 var gameObject = Instantiate(resouce, transform.position, transform.rotation);
                 

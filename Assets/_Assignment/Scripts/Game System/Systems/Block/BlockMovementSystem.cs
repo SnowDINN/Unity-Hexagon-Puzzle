@@ -26,7 +26,7 @@ namespace Anonymous.Game.Block
             GameEventSystem.EVT_MovementSystem -= EVT_MovementSystem;
         }
 
-        private void EVT_MovementSystem(int id, IHexagon hexagon)
+        private void EVT_MovementSystem(IHexagon hexagon, int id)
         {
             if (block.id == id)
                 Movement(block, hexagon);
@@ -34,6 +34,8 @@ namespace Anonymous.Game.Block
 
         private void Movement(IBlock block, IHexagon hexagon)
         {
+            block.BindHexagon(hexagon);
+            
             if (movementBlock != null)
                 StopCoroutine(movementBlock);
             movementBlock = StartCoroutine(co_movementBlock(block, hexagon));
@@ -42,8 +44,8 @@ namespace Anonymous.Game.Block
         private IEnumerator co_movementBlock(IBlock block, IHexagon hexagon)
         {
             var time = 0f;
-            
-            block.BindHexagon(hexagon);
+
+            hexagon.SetCollider(false);
             while (Vector2.Distance(transform.localPosition, Vector2.zero) > 0)
             {
                 time = Mathf.MoveTowards(time, animationMaxSpeed, Time.deltaTime * animationVelocitySpeed);
@@ -51,9 +53,10 @@ namespace Anonymous.Game.Block
                 yield return null;
             }
             hexagon.BindBlock(block);
+            hexagon.SetCollider(true);
             
             GameEventSystem.EVT_DetectBlankSystemPublish();
-            GameEventSystem.EVT_MatchPublish();
+            GameEventSystem.EVT_MatchPublish(block.id);
         }
     }
 }

@@ -7,9 +7,9 @@ namespace Anonymous.Game
     {
         public delegate void Delegate_DetectBlankSystem();
 
-        public delegate void Delegate_MatchSystem();
+        public delegate void Delegate_MatchSystem(int id);
 
-        public delegate void Delegate_MovementSystem(int id, IHexagon hexagon);
+        public delegate void Delegate_MovementSystem(IHexagon hexagon, int id);
 
         public static event Delegate_MovementSystem EVT_MovementSystem;
         public static event Delegate_MatchSystem EVT_MatchSystem;
@@ -22,12 +22,12 @@ namespace Anonymous.Game
 
         public static void EVT_MovementPublish(this IHexagon hexagon, int id)
         {
-            EVT_MovementSystem?.Invoke(id, hexagon);
+            EVT_MovementSystem?.Invoke(hexagon, id);
         }
 
-        public static void EVT_MatchPublish()
+        public static void EVT_MatchPublish(int id)
         {
-            EVT_MatchSystem?.Invoke();
+            EVT_MatchSystem?.Invoke(id);
         }
 
         public static void EVT_DetectBlankSystemPublish()

@@ -8,7 +8,7 @@ namespace Anonymous.Game.Hexagon
     {
         [SerializeField] private List<HexagonPositionModel> detectedHexagons;
 
-        private readonly Dictionary<PositionType, IHexagon> systems = new();
+        private readonly Dictionary<PositionType, IHexagon> systemTypes = new();
         private IHexagon hexagon;
 
 #if UNITY_EDITOR
@@ -41,7 +41,7 @@ namespace Anonymous.Game.Hexagon
                 foreach (var hit2D in hit2Ds)
                 {
                     if (hit2D.collider != null && hit2D.collider.CompareTag("Hexagon"))
-                        systems.Add(detectedHexagon.type, hit2D.transform.GetComponent<IHexagon>());   
+                        systemTypes.Add(detectedHexagon.type, hit2D.transform.GetComponent<IHexagon>());   
                 }
             }
         }
@@ -58,13 +58,13 @@ namespace Anonymous.Game.Hexagon
 
         private void Movement()
         {
-            for (var i = 0; i < systems.Count; i++)
+            for (var i = 0; i < systemTypes.Count; i++)
             {
                 var key = (PositionType)i;
-                if (!systems.ContainsKey(key))
+                if (!systemTypes.ContainsKey(key))
                     continue;
 
-                var nextHexagon = systems[key];
+                var nextHexagon = systemTypes[key];
                 if (nextHexagon == null)
                     continue;
 

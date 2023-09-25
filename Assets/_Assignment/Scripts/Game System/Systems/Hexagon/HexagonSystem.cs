@@ -14,6 +14,8 @@ namespace Anonymous.Game.Hexagon
     public class HexagonSystem : MonoBehaviour, ISystem, IHexagon
     {
         public IBlock block { get; set; }
+        
+        private Collider2D collider;
 
         public Transform transform
         {
@@ -32,11 +34,19 @@ namespace Anonymous.Game.Hexagon
             this.block = block;
         }
 
+        public void SetCollider(bool enabled)
+        {
+            if (collider != null)
+                collider.enabled = enabled;
+        }
+
         public void Setup()
         {
             var hexagonSystems = GetComponentsInChildren<IHexagonSystem>(true);
             foreach (var hexagonSystem in hexagonSystems)
                 hexagonSystem.Setup(this);
+            
+            collider = GetComponent<Collider2D>();
         }
 
         public void Teardown()
@@ -44,11 +54,6 @@ namespace Anonymous.Game.Hexagon
             var hexagonSystems = GetComponentsInChildren<IHexagonSystem>(true);
             foreach (var hexagonSystem in hexagonSystems)
                 hexagonSystem.Teardown();
-        }
-
-        public Transform GetTransform()
-        {
-            return transform;
         }
     }
 }

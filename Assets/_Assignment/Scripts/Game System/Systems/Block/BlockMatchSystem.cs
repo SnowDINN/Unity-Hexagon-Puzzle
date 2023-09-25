@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Anonymous.Game.Hexagon;
@@ -8,10 +9,12 @@ namespace Anonymous.Game.Block
 {
     public class BlockMatchSystem : MonoBehaviour, IBlockSystem
     {
+        private static readonly Dictionary<BlockType, List<List<IBlock>>> matchTypes = new();
+
         [Header("Matching Block Position Field")] [SerializeField]
         private List<BlockPositionModel> blocks;
 
-        private readonly Dictionary<PositionType, List<IHexagon>> systems = new();
+        private readonly Dictionary<PositionType, List<IHexagon>> systemTypes = new();
         private IBlock block;
 
 #if UNITY_EDITOR
@@ -22,8 +25,9 @@ namespace Anonymous.Game.Block
             {
                 Gizmos.color = Color.black;
 
-                foreach (var position in blocks.SelectMany(block => block.positions))
-                    Gizmos.DrawSphere(transform.position.CalculateLocalPosition(position), radius);
+                foreach (var block in blocks)
+                    Gizmos.DrawRay(transform.position.CalculateLocalPosition(block.positions[0]),
+                        block.positions[1]);
             }
         }
 #endif
@@ -40,9 +44,17 @@ namespace Anonymous.Game.Block
             GameEventSystem.EVT_MatchSystem -= EVT_MatchSystem;
         }
 
-        private void EVT_MatchSystem()
+        [InitializeOnLoadMethod]
+        private static void InitializeOnLoadDictionary()
         {
-            Match();
+            foreach (var type in Enum.GetValues(typeof(BlockType)))
+                matchTypes.Add((BlockType)type, new List<List<IBlock>>());
+        }
+
+        private void EVT_MatchSystem(int id)
+        {
+            if (block.id == id)
+                Match();
         }
 
         private void Match()
@@ -50,62 +62,108 @@ namespace Anonymous.Game.Block
             foreach (var block in blocks)
             {
                 var hexagons = new List<IHexagon>();
-                foreach (var position in block.positions)
-                {
-                    var ray = new Ray2D(transform.position.CalculateLocalPosition(position),
-                        Vector2.zero);
-                    var hit2Ds = Physics2D.RaycastAll(ray.origin, ray.direction);
-                    foreach (var hit2D in hit2Ds)
-                    {
-                        if (hit2D.collider != null && hit2D.collider.CompareTag("Hexagon"))
-                            hexagons.Add(hit2D.transform.GetComponent<IHexagon>());   
-                    }
-                }
-                
-                systems[block.type] = hexagons;
+                var ray = new Ray2D(transform.position.CalculateLocalPosition(block.positions[0]),
+                    block.positions[1]);
+                var hit2Ds = Physics2D.RaycastAll(ray.origin, ray.direction, 20);
+                foreach (var hit2D in hit2Ds)
+                    if (hit2D.collider != null && hit2D.collider.CompareTag("Hexagon"))
+                        hexagons.Add(hit2D.transform.GetComponent<IHexagon>());
+
+                systemTypes[block.type] = hexagons;
             }
 
-            for (var i = 0; i < systems.Count; i++)
-            {
-                var match = systems[(PositionType)i];
-                if (match.Count != 3)
-                    continue;
-
-                if (match[0].block?.type != block.type || match[1].block?.type != block.type || match[2].block?.type != block.type)
-                    continue;
-                
-                var blocks = new List<IBlock> { match[0].block, match[1].block, match[2].block };
-                if (blocks.Any(block => block.id < 0))
-                    return;
-
-                GameSystem.Default.MatchedBlock[block.type].AddRange(blocks);
-                DeleteMatch(systems[(PositionType)i]);
-            }
+            AddMatchBlocks();
         }
 
-        public void DeleteMatch(List<IHexagon> hexagons)
+        private void AddMatchBlocks()
         {
-            for (var type = 0; type < GameSystem.Default.MatchedBlock.Count; type++)
+            for (var i = 0; i < systemTypes.Count; i++)
             {
-                var blocks = GameSystem.Default.MatchedBlock[(BlockType)type];
-                if (blocks.Count <= 2)
+                var hexagons = systemTypes[(PositionType)i];
+                if (hexagons.Count < 3)
                     continue;
 
-                Debug.Log($"Match Blocks : {blocks[0].type}, {blocks.Count}");
-                while (blocks.Count > 0)
-                {
-                    if (blocks[0].id > 0)
-                        blocks[0].Dispose();
-                    blocks.RemoveAt(0);
-                }
+                var blocks = new List<List<IBlock>>();
+                var block = new List<IBlock>();
 
+                var index = 0;
                 foreach (var hexagon in hexagons)
+                    if (hexagon.block?.type == this.block?.type)
+                    {
+                        index += 1;
+                        block.Add(hexagon.block);
+                    }
+                    else
+                    {
+                        if (index >= 3)
+                        {
+                            blocks.Add(new List<IBlock>(block));
+                            block.Clear();
+
+                            index = 0;
+                        }
+                        else
+                        {
+                            block.Clear();
+                            index = 0;
+                        }
+                    }
+
+                if (block.Count >= 3)
                 {
-                    hexagon.block.BindHexagonNothing();
-                    hexagon.BindBlock(null);
+                    blocks.Add(new List<IBlock>(block));
+                    block.Clear();
+                }
+                
+                if (blocks.SelectMany(block => block).Any(item => item.id < 0))
+                    return;
+
+                if (blocks.Count > 0)
+                {
+                    foreach (var list in blocks)
+                        matchTypes[this.block.type].Add(list);
                 }
             }
             
+            var count = matchTypes.Select((_, type) => matchTypes[(BlockType)type]).Sum(matches =>
+                matches.Where(block => block.Count != 0).Sum(match => match.Count));
+            if (count == 0)
+            {
+
+            }
+            else
+            {
+                for (var i = 0; i < systemTypes.Count; i++)
+                    DeleteMatchBlocks(systemTypes[(PositionType)i]);
+            }
+            
+            foreach (var type in Enum.GetValues(typeof(BlockType)))
+                matchTypes[(BlockType)type].Clear();
+        }
+
+        public void DeleteMatchBlocks(List<IHexagon> hexagons)
+        {
+            for (var type = 0; type < matchTypes.Count; type++)
+            {
+                var blocks = matchTypes[(BlockType)type];
+                foreach (var block in blocks.Where(block => block.Count != 0))
+                {
+                    Debug.Log($"Match Blocks : {block[0].type}, {block.Count}");
+                    while (block.Count > 0)
+                    {
+                        foreach (var hexagon in hexagons.Where(hexagon => hexagon.block?.id == block[0]?.id))
+                        {
+                            hexagon.block.BindHexagonNothing();
+                            hexagon.BindBlock(null);
+                        }
+
+                        if (block[0].id > 0)
+                            block[0].Dispose();
+                        block.RemoveAt(0);
+                    }
+                }
+            }
+
             GameEventSystem.EVT_DetectBlankSystemPublish();
         }
     }

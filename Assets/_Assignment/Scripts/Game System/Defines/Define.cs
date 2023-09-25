@@ -16,10 +16,4 @@ namespace Anonymous.Game
         Left,
         Right,
     }
-
-    public enum ActivateType
-    {
-        Disable,
-        Enable,
-    }
 }

@@ -15,10 +15,14 @@ namespace Anonymous.Game
         {
             Default = this;
 
+#if UNITY_EDITOR
+            Application.runInBackground = true;
+#endif
+
             var systems = GetComponentsInChildren<ISystem>(true);
             foreach (var hexagon in systems)
                 hexagon.Setup();
-            
+
             var spawn = BindHexagon.GetComponent<IHexagon>();
             if (spawn != null)
                 co_spawn = StartCoroutine(update_spawn(spawn));

@@ -1,14 +1,15 @@
 using System.Collections;
 using Anonymous.Game.Hexagon;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace Anonymous.Game.Block
 {
     public class BlockMovementSystem : MonoBehaviour, IBlockSystem
     {
+        [FormerlySerializedAs("animationMaxSpeed")]
         [Header("Movement Animation Field")]
-        [SerializeField] private float animationMaxSpeed;
-        [SerializeField] private float animationVelocitySpeed;
+        [SerializeField] private float animationSpeed;
         private IBlock block;
 
         private Coroutine movementBlock;
@@ -47,8 +48,7 @@ namespace Anonymous.Game.Block
             hexagon.SetCollider(false);
             while (Vector2.Distance(transform.localPosition, Vector2.zero) > 0)
             {
-                time = Mathf.MoveTowards(time, animationMaxSpeed, Time.deltaTime * animationVelocitySpeed);
-                transform.localPosition = Vector2.MoveTowards(transform.localPosition, Vector2.zero, time / Time.deltaTime);
+                transform.localPosition = Vector2.MoveTowards(transform.localPosition, Vector2.zero, animationSpeed * Time.deltaTime);
                 yield return null;
             }
             hexagon.BindBlock(block);

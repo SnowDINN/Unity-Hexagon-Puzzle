@@ -6,9 +6,8 @@ namespace Anonymous.Game.Block
 {
     public class BlockMovementSystem : MonoBehaviour, IBlockSystem
     {
-        [Header("Movement Animation Field")] [SerializeField]
-        private float animationMaxSpeed;
-
+        [Header("Movement Animation Field")]
+        [SerializeField] private float animationMaxSpeed;
         [SerializeField] private float animationVelocitySpeed;
         private IBlock block;
 
@@ -49,7 +48,7 @@ namespace Anonymous.Game.Block
             while (Vector2.Distance(transform.localPosition, Vector2.zero) > 0)
             {
                 time = Mathf.MoveTowards(time, animationMaxSpeed, Time.deltaTime * animationVelocitySpeed);
-                transform.localPosition = Vector2.MoveTowards(transform.localPosition, Vector2.zero, time);
+                transform.localPosition = Vector2.MoveTowards(transform.localPosition, Vector2.zero, time / Time.deltaTime);
                 yield return null;
             }
             hexagon.BindBlock(block);

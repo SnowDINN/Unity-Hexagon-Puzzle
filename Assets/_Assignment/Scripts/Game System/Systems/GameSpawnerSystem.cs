@@ -10,6 +10,7 @@ namespace Anonymous.Game
     public class GameSpawnerSystem : MonoBehaviour, ISpawner
     {
         [SerializeField] private GameObject hexagongGameObject;
+        [SerializeField] private float spawnTime;
         private int index;
 
         private Coroutine spawn_Coroutine;
@@ -51,7 +52,7 @@ namespace Anonymous.Game
 
                 hexagon.BindBlock(block);
 
-                yield return new WaitForSeconds(0.2f);
+                yield return new WaitForSeconds(spawnTime);
             }
         }
     }

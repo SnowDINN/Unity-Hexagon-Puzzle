@@ -147,8 +147,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 449e36fccfff855409b490f3250a2018, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  animationMaxSpeed: 100
-  animationVelocitySpeed: 0.5
+  animationMaxSpeed: 50
+  animationVelocitySpeed: 0.1
 --- !u!114 &-8508928122536098044
 MonoBehaviour:
   m_ObjectHideFlags: 0

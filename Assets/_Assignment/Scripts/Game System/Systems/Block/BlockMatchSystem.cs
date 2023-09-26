@@ -83,46 +83,29 @@ namespace Anonymous.Game.Block
                 if (hexagons.Count < 3)
                     continue;
 
-                var blocks = new List<List<IBlock>>();
-                var block = new List<IBlock>();
-
+                var lists = new List<List<IBlock>>();
                 var index = 0;
                 foreach (var hexagon in hexagons)
-                    if (hexagon.block?.type == this.block?.type)
+                {
+                    if (lists.Count >= index)
+                        lists.Add(new List<IBlock>());
+                    
+                    if (hexagon.block?.type == block?.type)
                     {
-                        index += 1;
-                        block.Add(hexagon.block);
+                        lists[index].Add(hexagon.block);
                     }
                     else
                     {
-                        if (index >= 3)
-                        {
-                            blocks.Add(new List<IBlock>(block));
-                            block.Clear();
-
-                            index = 0;
-                        }
-                        else
-                        {
-                            block.Clear();
-                            index = 0;
-                        }
+                        if (lists[index].Count > 0)
+                            index += 1;
                     }
-
-                if (block.Count >= 3)
-                {
-                    blocks.Add(new List<IBlock>(block));
-                    block.Clear();
                 }
                 
-                if (blocks.SelectMany(block => block).Any(item => item.id < 0))
+                if (lists.SelectMany(list => list).Any(block => block.id < 0))
                     return;
-
-                if (blocks.Count > 0)
-                {
-                    foreach (var list in blocks)
-                        matchTypes[this.block.type].Add(list);
-                }
+                
+                foreach (var list in lists.Where(list => list.Count > 2))
+                    matchTypes[block.type].Add(list);
             }
             
             var count = matchTypes.Select((_, type) => matchTypes[(BlockType)type]).Sum(matches =>

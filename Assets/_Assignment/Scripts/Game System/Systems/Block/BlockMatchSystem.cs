@@ -122,6 +122,8 @@ namespace Anonymous.Game.Block
             
             foreach (var type in Enum.GetValues(typeof(BlockType)))
                 matchTypes[(BlockType)type].Clear();
+            
+            GameEventSystem.EVT_DetectBlankSystemPublish();
         }
 
         public void DeleteMatchBlocks(List<IHexagon> hexagons)
@@ -146,8 +148,6 @@ namespace Anonymous.Game.Block
                     }
                 }
             }
-
-            GameEventSystem.EVT_DetectBlankSystemPublish();
         }
     }
 }

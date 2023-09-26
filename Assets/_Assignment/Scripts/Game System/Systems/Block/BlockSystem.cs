@@ -32,6 +32,7 @@ namespace Anonymous.Game.Block
             this.type = type;
 
             BindHexagon(hexagon);
+            hexagon.BindBlock(this);
             hexagon.EVT_MovementPublish(id);
         }
 

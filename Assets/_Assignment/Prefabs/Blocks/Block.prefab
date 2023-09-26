@@ -148,7 +148,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   animationMaxSpeed: 50
-  animationVelocitySpeed: 0.1
+  animationVelocitySpeed: 0.01
 --- !u!114 &-8508928122536098044
 MonoBehaviour:
   m_ObjectHideFlags: 0

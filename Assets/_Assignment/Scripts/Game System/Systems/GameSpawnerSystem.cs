@@ -7,28 +7,20 @@ using Random = UnityEngine.Random;
 
 namespace Anonymous.Game
 {
-    public class GameSpawnerSystem : MonoBehaviour, ISpawner
+    internal partial class GameSystem
     {
-        [SerializeField] private GameObject hexagongGameObject;
+        [Header("First Binding Hexagon")] [SerializeField]
+        private GameObject BindHexagon;
+
+        [Header("Spawn Options")] [SerializeField]
+        private Transform SpawnTransform;
+
         [SerializeField] private float spawnTime;
+
+        private Coroutine co_spawn;
         private int index;
 
-        private Coroutine spawn_Coroutine;
-
-        public void Setup()
-        {
-            var hexagon = hexagongGameObject.GetComponent<IHexagon>();
-            if (hexagon != null)
-                spawn_Coroutine = StartCoroutine(update_Spawn(hexagon));
-        }
-
-        public void Teardown()
-        {
-            if (spawn_Coroutine != null)
-                StopCoroutine(spawn_Coroutine);
-        }
-
-        private IEnumerator update_Spawn(IHexagon hexagon)
+        private IEnumerator update_spawn(IHexagon hexagon)
         {
             while (true)
             {
@@ -42,7 +34,7 @@ namespace Anonymous.Game
 
                 var type = (BlockType)Random.Range(0, Enum.GetValues(typeof(BlockType)).Length);
                 var resouce = Resources.Load($"Block {type}") as GameObject;
-                var gameObject = Instantiate(resouce, transform.position, transform.rotation);
+                var gameObject = Instantiate(resouce, SpawnTransform.position, SpawnTransform.rotation);
 
                 var system = gameObject.GetComponent<ISystem>();
                 system?.Setup();
@@ -50,7 +42,7 @@ namespace Anonymous.Game
                 var block = gameObject.GetComponent<IBlock>();
                 block?.Spawn(index, type, hexagon);
 
-                hexagon.BindBlock(block);
+                Blocks.Add(index, block);
 
                 yield return new WaitForSeconds(spawnTime);
             }

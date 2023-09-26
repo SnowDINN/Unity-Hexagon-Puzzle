@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using Anonymous.Game.Hexagon;
@@ -41,14 +40,23 @@ namespace Anonymous.Game
         {
             while (true)
             {
+#if UNITY_EDITOR
                 if (Input.GetMouseButtonDown(0))
+#elif UNITY_ANDROID
+                if (Input.touchCount > 0)
+                if (Input.GetTouch(0).phase == TouchPhase.Began)
+#endif
                 {
                     IHexagon current = null;
 
                     var isMouseButtonDown = true;
                     while (isMouseButtonDown)
                     {
+#if UNITY_EDITOR
                         if (Input.GetMouseButtonUp(0))
+#elif UNITY_ANDROID
+                        if (Input.GetTouch(0).phase == TouchPhase.Ended)
+#endif
                         {
                             current = null;
                             isMouseButtonDown = false;
@@ -76,10 +84,10 @@ namespace Anonymous.Game
 
                                 targetHexagon.Add(current);
                                 targetHexagon.Add(target);
-                                
+
                                 current.EVT_MovementPublish(target.block.id);
                                 target.EVT_MovementPublish(current.block.id);
-                                
+
                                 isMouseButtonDown = false;
                             }
                         }

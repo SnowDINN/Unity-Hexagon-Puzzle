@@ -44,7 +44,7 @@ namespace Anonymous.Game.Block
             GameEventSystem.EVT_MatchSystem -= EVT_MatchSystem;
         }
 
-        [InitializeOnLoadMethod]
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
         private static void InitializeOnLoadDictionary()
         {
             foreach (var type in Enum.GetValues(typeof(BlockType)))

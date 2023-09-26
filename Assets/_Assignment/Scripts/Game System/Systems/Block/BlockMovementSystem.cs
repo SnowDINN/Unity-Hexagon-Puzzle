@@ -8,10 +8,11 @@ namespace Anonymous.Game.Block
     {
         [Header("Movement Animation Field")] [SerializeField]
         private float animationSpeed;
-
-        private IBlock block;
-
+        
         private Coroutine movementBlock;
+        private IBlock block;
+        
+        private GameSystem system => GameSystem.Default;
 
         public void Setup(IBlock block)
         {
@@ -39,8 +40,8 @@ namespace Anonymous.Game.Block
             {
                 StopCoroutine(movementBlock);
 
-                if (GameSystem.Default.isMovementArray.Contains(block.id))
-                    GameSystem.Default.isMovementArray.Remove(block.id);
+                if (system.isMovementArray.Contains(block.id))
+                    system.isMovementArray.Remove(block.id);
             }
 
             movementBlock = StartCoroutine(co_movementBlock(block, hexagon));
@@ -51,7 +52,7 @@ namespace Anonymous.Game.Block
             var time = 0f;
 
 
-            GameSystem.Default.isMovementArray.Add(block.id);
+            system.isMovementArray.Add(block.id);
             while (Vector2.Distance(transform.localPosition, Vector2.zero) > 0)
             {
                 transform.localPosition = Vector2.MoveTowards(transform.localPosition, Vector2.zero,
@@ -61,7 +62,7 @@ namespace Anonymous.Game.Block
 
             hexagon.BindBlock(block);
 
-            if (!GameSystem.Default.isMovementArray.Remove(block.id))
+            if (!system.isMovementArray.Remove(block.id))
                 yield break;
 
             GameEventSystem.EVT_DetectBlankSystemPublish();

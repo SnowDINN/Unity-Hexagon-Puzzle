@@ -16,6 +16,8 @@ namespace Anonymous.Game.Block
 
         private readonly Dictionary<PositionType, List<IHexagon>> systemTypes = new();
         private IBlock block;
+        
+        private GameSystem system => GameSystem.Default;
 
 #if UNITY_EDITOR
         private void OnDrawGizmos()
@@ -119,11 +121,11 @@ namespace Anonymous.Game.Block
                 matches.Where(block => block.Count != 0).Sum(match => match.Count));
             if (count == 0)
             {
-                GameSystem.Default.isNotMatchedArray.Add(true);
+                system.isNotMatchedArray.Add(true);
             }
             else
             {
-                GameSystem.Default.isNotMatchedArray.Add(false);
+                system.isNotMatchedArray.Add(false);
                 
                 for (var i = 0; i < systemTypes.Count; i++)
                     DeleteMatchBlocks(systemTypes[(PositionType)i]);
@@ -139,6 +141,7 @@ namespace Anonymous.Game.Block
                 var blocks = matchTypes[(BlockType)type];
                 foreach (var block in blocks.Where(block => block.Count != 0))
                 {
+                    GameEventSystem.EVT_MatchSuccessPublish(block.Count);
                     while (block.Count > 0)
                     {
                         foreach (var hexagon in hexagons.Where(hexagon => hexagon.block?.id == block[0]?.id))

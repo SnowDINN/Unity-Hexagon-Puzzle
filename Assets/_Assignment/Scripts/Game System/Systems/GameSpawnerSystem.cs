@@ -42,8 +42,6 @@ namespace Anonymous.Game
                 var block = gameObject.GetComponent<IBlock>();
                 block?.Spawn(index, type, hexagon);
 
-                Blocks.Add(index, block);
-
                 yield return new WaitForSeconds(spawnTime);
             }
         }

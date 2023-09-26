@@ -11,8 +11,8 @@ namespace Anonymous.Game.Block
     {
         private static readonly Dictionary<BlockType, List<List<IBlock>>> matchTypes = new();
 
-        [Header("Matching Block Position Field")] [SerializeField]
-        private List<BlockPositionModel> blocks;
+        [Header("Matching Block Position Field")]
+        [SerializeField] private List<BlockPositionModel> blocks;
 
         private readonly Dictionary<PositionType, List<IHexagon>> systemTypes = new();
         private IBlock block;
@@ -112,10 +112,12 @@ namespace Anonymous.Game.Block
                 matches.Where(block => block.Count != 0).Sum(match => match.Count));
             if (count == 0)
             {
-
+                GameSystem.Default.isNotMatchedArray.Add(true);
             }
             else
             {
+                GameSystem.Default.isNotMatchedArray.Add(false);
+                
                 for (var i = 0; i < systemTypes.Count; i++)
                     DeleteMatchBlocks(systemTypes[(PositionType)i]);
             }

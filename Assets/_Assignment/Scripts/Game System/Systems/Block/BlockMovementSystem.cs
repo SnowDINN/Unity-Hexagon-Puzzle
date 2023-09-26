@@ -1,15 +1,14 @@
 using System.Collections;
 using Anonymous.Game.Hexagon;
 using UnityEngine;
-using UnityEngine.Serialization;
 
 namespace Anonymous.Game.Block
 {
     public class BlockMovementSystem : MonoBehaviour, IBlockSystem
     {
-        [FormerlySerializedAs("animationMaxSpeed")]
-        [Header("Movement Animation Field")]
-        [SerializeField] private float animationSpeed;
+        [Header("Movement Animation Field")] [SerializeField]
+        private float animationSpeed;
+
         private IBlock block;
 
         private Coroutine movementBlock;
@@ -35,9 +34,15 @@ namespace Anonymous.Game.Block
         private void Movement(IBlock block, IHexagon hexagon)
         {
             block.BindHexagon(hexagon);
-            
+
             if (movementBlock != null)
+            {
                 StopCoroutine(movementBlock);
+
+                if (GameSystem.Default.isMovementArray.Contains(block.id))
+                    GameSystem.Default.isMovementArray.Remove(block.id);
+            }
+
             movementBlock = StartCoroutine(co_movementBlock(block, hexagon));
         }
 
@@ -45,15 +50,20 @@ namespace Anonymous.Game.Block
         {
             var time = 0f;
 
-            hexagon.SetCollider(false);
+
+            GameSystem.Default.isMovementArray.Add(block.id);
             while (Vector2.Distance(transform.localPosition, Vector2.zero) > 0)
             {
-                transform.localPosition = Vector2.MoveTowards(transform.localPosition, Vector2.zero, animationSpeed * Time.deltaTime);
+                transform.localPosition = Vector2.MoveTowards(transform.localPosition, Vector2.zero,
+                    animationSpeed * Time.deltaTime);
                 yield return null;
             }
+
             hexagon.BindBlock(block);
-            hexagon.SetCollider(true);
-            
+
+            if (!GameSystem.Default.isMovementArray.Remove(block.id))
+                yield break;
+
             GameEventSystem.EVT_DetectBlankSystemPublish();
             GameEventSystem.EVT_MatchPublish(block.id);
         }

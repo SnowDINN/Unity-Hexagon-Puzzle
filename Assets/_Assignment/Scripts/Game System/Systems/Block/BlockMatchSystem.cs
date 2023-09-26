@@ -53,6 +53,9 @@ namespace Anonymous.Game.Block
 
         private void EVT_MatchSystem(int id)
         {
+            foreach (var type in Enum.GetValues(typeof(BlockType)))
+                matchTypes[(BlockType)type].Clear();
+            
             if (block.id == id)
                 Match();
         }
@@ -80,7 +83,7 @@ namespace Anonymous.Game.Block
             for (var i = 0; i < systemTypes.Count; i++)
             {
                 var hexagons = systemTypes[(PositionType)i];
-                if (hexagons.Count < 3)
+                if (hexagons.Count <= 2)
                     continue;
 
                 var lists = new List<List<IBlock>>();
@@ -103,9 +106,13 @@ namespace Anonymous.Game.Block
                 
                 if (lists.SelectMany(list => list).Any(block => block.id < 0))
                     return;
-                
-                foreach (var list in lists.Where(list => list.Count > 2))
-                    matchTypes[block.type].Add(list);
+
+                foreach (var list in lists.Where(list => list.Count >= 3))
+                {
+                    var refine = list.GroupBy(i => i.id).Select(i => i.FirstOrDefault()).ToList();
+                    if (refine.Count >= 3)
+                        matchTypes[block.type].Add(refine);
+                }
             }
             
             var count = matchTypes.Select((_, type) => matchTypes[(BlockType)type]).Sum(matches =>
@@ -122,9 +129,6 @@ namespace Anonymous.Game.Block
                     DeleteMatchBlocks(systemTypes[(PositionType)i]);
             }
             
-            foreach (var type in Enum.GetValues(typeof(BlockType)))
-                matchTypes[(BlockType)type].Clear();
-            
             GameEventSystem.EVT_DetectBlankSystemPublish();
         }
 
@@ -135,7 +139,6 @@ namespace Anonymous.Game.Block
                 var blocks = matchTypes[(BlockType)type];
                 foreach (var block in blocks.Where(block => block.Count != 0))
                 {
-                    Debug.Log($"Match Blocks : {block[0].type}, {block.Count}");
                     while (block.Count > 0)
                     {
                         foreach (var hexagon in hexagons.Where(hexagon => hexagon.block?.id == block[0]?.id))

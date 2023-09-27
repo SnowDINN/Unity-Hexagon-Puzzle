@@ -34,6 +34,7 @@ namespace Anonymous.Game
             Default = this;
             installer = Resources.Load("Installer") as Installer.Installer;
             
+            matchTypes.Clear();
             foreach (var type in Enum.GetValues(typeof(BlockType)))
                 matchTypes.Add((BlockType)type, new List<List<IBlock>>());
             
@@ -58,7 +59,6 @@ namespace Anonymous.Game
         {
             isNotMatchedArray.Clear();
             isMovementArray.Clear();
-            matchTypes.Clear();
             
             var systems = GetComponentsInChildren<ISystem>(true);
             foreach (var hexagon in systems)

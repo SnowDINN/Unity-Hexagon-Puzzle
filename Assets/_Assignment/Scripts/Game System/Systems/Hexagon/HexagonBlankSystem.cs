@@ -41,7 +41,7 @@ namespace Anonymous.Game.Hexagon
                 foreach (var hit2D in hit2Ds)
                 {
                     if (hit2D.collider != null && hit2D.collider.CompareTag("Hexagon"))
-                        systemTypes.Add(detectedHexagon.type, hit2D.transform.GetComponent<IHexagon>());   
+                        systemTypes[detectedHexagon.type] = hit2D.transform.GetComponent<IHexagon>();   
                 }
             }
         }

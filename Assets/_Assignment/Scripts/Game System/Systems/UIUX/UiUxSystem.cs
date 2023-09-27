@@ -43,6 +43,8 @@ namespace Anonymous.Game.UiUx
                 {
                     StartCoroutine(co_endedApplication("Game Complete !!"));
                     uiImageTrophy.color = Color.white;
+                    
+                    uiSlider.onValueChanged.RemoveAllListeners();
                 }
             });
             uiImageTrophy.color = Color.black;

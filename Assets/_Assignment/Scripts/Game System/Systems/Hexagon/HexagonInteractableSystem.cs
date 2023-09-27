@@ -49,9 +49,6 @@ namespace Anonymous.Game.Hexagon
         {
             if (interactableTarget != null)
                 StopCoroutine(interactableTarget);
-
-            if (isNotMatched != null)
-                StopCoroutine(isNotMatched);
         }
 
         private IEnumerator co_interactableTarget()
@@ -65,7 +62,7 @@ namespace Anonymous.Game.Hexagon
                 target = raycastHit2D.transform.GetComponent<IHexagon>();
                 yield return null;
             }
-            
+
             if (isNotMatched != null)
                 StopCoroutine(isNotMatched);
             isNotMatched = StartCoroutine(co_isNotMatched(hexagon, target));

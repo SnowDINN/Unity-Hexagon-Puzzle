@@ -9,6 +9,5 @@ namespace Anonymous.Game.Hexagon
         Transform transform { get; set; }
         bool hasBind { get; set; }
         void BindBlock(IBlock block);
-        void SetCollider(bool enabled);
     }
 }

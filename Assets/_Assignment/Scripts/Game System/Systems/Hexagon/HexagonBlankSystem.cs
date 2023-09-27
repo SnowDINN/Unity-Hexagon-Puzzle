@@ -49,6 +49,8 @@ namespace Anonymous.Game.Hexagon
         public void Teardown()
         {
             GameEventSystem.EVT_DetectBlankSystem -= EVT_DetectBlankSystem;
+            
+            systemTypes.Clear();   
         }
 
         private void EVT_DetectBlankSystem()
@@ -71,7 +73,7 @@ namespace Anonymous.Game.Hexagon
                 if (nextHexagon.hasBind)
                     continue;
 
-                if (hexagon.block != null)
+                if (hexagon.block?.id > 0)
                 {
                     nextHexagon.EVT_MovementPublish(hexagon.block.id);
                     hexagon.BindBlock(null);

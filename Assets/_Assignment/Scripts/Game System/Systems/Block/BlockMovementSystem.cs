@@ -24,6 +24,9 @@ namespace Anonymous.Game.Block
         public void Teardown()
         {
             GameEventSystem.EVT_MovementSystem -= EVT_MovementSystem;
+            
+            if (movementBlock != null)
+                StopCoroutine(movementBlock);
         }
 
         private void EVT_MovementSystem(IHexagon hexagon, int id)

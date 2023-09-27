@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using Anonymous.Game.Block;
 using Anonymous.Game.Hexagon;
 using UnityEngine;
@@ -9,14 +10,16 @@ namespace Anonymous.Game
 {
     internal partial class GameSystem
     {
-        [Header("First Binding Hexagon")] [SerializeField]
-        private GameObject BindHexagon;
+        [Header("First Binding Hexagon")]
+        [SerializeField] private GameObject BindHexagon;
 
-        [Header("Spawn Options")] [SerializeField]
-        private Transform SpawnTransform;
+        [Header("Spawn Options")] 
+        [SerializeField] private Transform SpawnTransform;
 
         [SerializeField] private float spawnTime;
 
+        public Dictionary<int, IBlock> BlockManagement = new();
+        
         private Coroutine co_spawn;
         private int index;
 
@@ -41,7 +44,8 @@ namespace Anonymous.Game
 
                 var block = gameObject.GetComponent<IBlock>();
                 block?.Spawn(index, type, hexagon);
-
+                
+                BlockManagement.Add(index, block);
                 yield return new WaitForSeconds(spawnTime);
             }
         }

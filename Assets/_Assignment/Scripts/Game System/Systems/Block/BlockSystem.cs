@@ -15,6 +15,8 @@ namespace Anonymous.Game.Block
     {
         public int id { get; set; }
         public BlockType type { get; set; }
+        
+        private GameSystem system => GameSystem.Default;
 
         public void Dispose()
         {
@@ -22,7 +24,9 @@ namespace Anonymous.Game.Block
             foreach (var blockSystem in blockSystems)
                 blockSystem.Teardown();
 
+            system.BlockManagement.Remove(id);
             id = -1;
+            
             Destroy(gameObject);
         }
 

@@ -1,3 +1,4 @@
+using Anonymous.Game.UiUx.Popup;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -13,11 +14,16 @@ namespace Anonymous.Game.UiUx
         [SerializeField] private Slider uiSlider;
         [SerializeField] private TextMeshProUGUI uiTextScore;
 
+        [Header("Popup GameObject")] 
+        [SerializeField] private GameObject popupGameObject;
+
         private GameSystem system => GameSystem.Default;
 
         public void Setup()
         {
             uiTextCount.text = $"{system.installer.MoveCount}";
+
+            uiSlider.value = 0;
             uiSlider.maxValue = system.installer.MaxScore;
             uiSlider.onValueChanged.AddListener(value =>
             {
@@ -36,7 +42,16 @@ namespace Anonymous.Game.UiUx
 
         private void EvtMovementSuccessSystem()
         {
-            uiTextCount.text = $"{int.Parse(uiTextCount.text) - 1}";
+            var count = int.Parse(uiTextCount.text) - 1;
+            uiTextCount.text = $"{count}";
+
+            if (count < 1)
+            {
+                var go = Instantiate(popupGameObject);
+                go.GetComponent<PopupSystem>().Setup("Game Over !!");
+;                
+                GameSystem.Default.EndedApplication();
+            }
         }
         
         private void EVT_MatchSuccessSystem(int score)

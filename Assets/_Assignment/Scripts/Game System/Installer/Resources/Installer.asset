@@ -13,4 +13,4 @@ MonoBehaviour:
   m_Name: Installer
   m_EditorClassIdentifier: 
   MoveCount: 20
-  MaxScore: 20000
+  MaxScore: 1000

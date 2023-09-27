@@ -15,8 +15,6 @@ namespace Anonymous.Game.Hexagon
     {
         public IBlock block { get; set; }
         
-        private Collider2D collider;
-
         public Transform transform
         {
             get => gameObject.transform;
@@ -34,19 +32,11 @@ namespace Anonymous.Game.Hexagon
             this.block = block;
         }
 
-        public void SetCollider(bool enabled)
-        {
-            if (collider != null)
-                collider.enabled = enabled;
-        }
-
         public void Setup()
         {
             var hexagonSystems = GetComponentsInChildren<IHexagonSystem>(true);
             foreach (var hexagonSystem in hexagonSystems)
                 hexagonSystem.Setup(this);
-            
-            collider = GetComponent<Collider2D>();
         }
 
         public void Teardown()
@@ -54,6 +44,8 @@ namespace Anonymous.Game.Hexagon
             var hexagonSystems = GetComponentsInChildren<IHexagonSystem>(true);
             foreach (var hexagonSystem in hexagonSystems)
                 hexagonSystem.Teardown();
+
+            block = null;
         }
     }
 }

@@ -9,8 +9,6 @@ namespace Anonymous.Game.Block
 {
     public class BlockMatchSystem : MonoBehaviour, IBlockSystem
     {
-        private static readonly Dictionary<BlockType, List<List<IBlock>>> matchTypes = new();
-
         [Header("Matching Block Position Field")]
         [SerializeField] private List<BlockPositionModel> blocks;
 
@@ -37,26 +35,21 @@ namespace Anonymous.Game.Block
         public void Setup(IBlock block)
         {
             this.block = block;
-
+            
             GameEventSystem.EVT_MatchSystem += EVT_MatchSystem;
         }
 
         public void Teardown()
         {
             GameEventSystem.EVT_MatchSystem -= EVT_MatchSystem;
-        }
-
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-        private static void InitializeOnLoadDictionary()
-        {
-            foreach (var type in Enum.GetValues(typeof(BlockType)))
-                matchTypes.Add((BlockType)type, new List<List<IBlock>>());
+            
+            systemTypes.Clear();
         }
 
         private void EVT_MatchSystem(int id)
         {
             foreach (var type in Enum.GetValues(typeof(BlockType)))
-                matchTypes[(BlockType)type].Clear();
+                system.matchTypes[(BlockType)type].Clear();
             
             if (block.id == id)
                 Match();
@@ -113,11 +106,11 @@ namespace Anonymous.Game.Block
                 {
                     var refine = list.GroupBy(i => i.id).Select(i => i.FirstOrDefault()).ToList();
                     if (refine.Count >= 3)
-                        matchTypes[block.type].Add(refine);
+                        system.matchTypes[block.type].Add(refine);
                 }
             }
             
-            var count = matchTypes.Select((_, type) => matchTypes[(BlockType)type]).Sum(matches =>
+            var count = system.matchTypes.Select((_, type) => system.matchTypes[(BlockType)type]).Sum(matches =>
                 matches.Where(block => block.Count != 0).Sum(match => match.Count));
             if (count == 0)
             {
@@ -136,9 +129,9 @@ namespace Anonymous.Game.Block
 
         public void DeleteMatchBlocks(List<IHexagon> hexagons)
         {
-            for (var type = 0; type < matchTypes.Count; type++)
+            for (var type = 0; type < system.matchTypes.Count; type++)
             {
-                var blocks = matchTypes[(BlockType)type];
+                var blocks = system.matchTypes[(BlockType)type];
                 foreach (var block in blocks.Where(block => block.Count != 0))
                 {
                     GameEventSystem.EVT_MatchSuccessPublish(block.Count);

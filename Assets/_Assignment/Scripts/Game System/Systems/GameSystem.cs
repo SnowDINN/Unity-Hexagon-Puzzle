@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using Anonymous.Game.Block;
 using Anonymous.Game.Hexagon;
 using Anonymous.Game.UiUx;
 using UnityEngine;
@@ -12,12 +14,26 @@ namespace Anonymous.Game
         [HideInInspector] public List<int> isMovementArray = new();
         [HideInInspector] public Installer.Installer installer;
 
+        public readonly Dictionary<BlockType, List<List<IBlock>>> matchTypes = new();
         public bool canInteractable => isMovementArray.Count <= 0;
 
         private void OnEnable()
         {
+            StartedApplication();
+        }
+
+        private void OnDisable()
+        {
+            EndedApplication();
+        }
+
+        public void StartedApplication()
+        {
             Default = this;
             installer = Resources.Load("Installer") as Installer.Installer;
+            
+            foreach (var type in Enum.GetValues(typeof(BlockType)))
+                matchTypes.Add((BlockType)type, new List<List<IBlock>>());
             
 #if UNITY_EDITOR
             Application.runInBackground = true;
@@ -36,8 +52,12 @@ namespace Anonymous.Game
                 co_spawn = StartCoroutine(update_spawn(spawn));
         }
 
-        private void OnDisable()
+        public void EndedApplication()
         {
+            isNotMatchedArray.Clear();
+            isMovementArray.Clear();
+            matchTypes.Clear();
+            
             var systems = GetComponentsInChildren<ISystem>(true);
             foreach (var hexagon in systems)
                 hexagon.Teardown();

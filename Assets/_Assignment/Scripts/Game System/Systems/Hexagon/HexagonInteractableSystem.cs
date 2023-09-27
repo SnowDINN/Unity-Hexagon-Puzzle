@@ -19,7 +19,11 @@ namespace Anonymous.Game.Hexagon
 
         public void Teardown()
         {
-
+            if (interactableTarget != null)
+                StopCoroutine(interactableTarget);
+            
+            if (isNotMatched != null)
+                StopCoroutine(isNotMatched);
         }
         
         private void OnMouseDown()
@@ -36,8 +40,7 @@ namespace Anonymous.Game.Hexagon
         {
             if (!system.canInteractable)
                 return;
-
-            GameEventSystem.EVT_MovementSuccessPublish();
+            
             system.isNotMatchedArray.Clear();
 
             if (interactableTarget != null)
@@ -69,6 +72,8 @@ namespace Anonymous.Game.Hexagon
                 
             hexagon.EVT_MovementPublish(target.block.id);
             target.EVT_MovementPublish(hexagon.block.id);
+            
+            GameEventSystem.EVT_MovementSuccessPublish();
         }
 
         private IEnumerator co_isNotMatched(IHexagon current, IHexagon target)

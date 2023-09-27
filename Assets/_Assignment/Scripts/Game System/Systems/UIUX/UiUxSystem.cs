@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Linq;
 using Anonymous.Game.UiUx.Popup;
 using TMPro;
 using UnityEngine;
@@ -15,13 +16,11 @@ namespace Anonymous.Game.UiUx
         private Slider uiSlider;
 
         [SerializeField] private TextMeshProUGUI uiTextScore;
+        [SerializeField] private Image uiImageTrophy;
 
         [Header("Popup GameObject")] [SerializeField]
         private GameObject popupGameObject;
 
-        private IEnumerator endedApplication;
-
-        private Coroutine endedApplicationCoroutine;
         private bool isAllChecking;
 
         private GameSystem system => GameSystem.Default;
@@ -42,10 +41,11 @@ namespace Anonymous.Game.UiUx
 
                 if (value >= uiSlider.maxValue)
                 {
-                    endedApplication = co_endedApplication("Game Complete !!");
-                    endedApplicationCoroutine = StartCoroutine(endedApplication);
+                    StartCoroutine(co_endedApplication("Game Complete !!"));
+                    uiImageTrophy.color = Color.white;
                 }
             });
+            uiImageTrophy.color = Color.black;
 
             GameEventSystem.EVT_MovementSuccessSystem += EvtMovementSuccessSystem;
             GameEventSystem.EVT_MatchSuccessSystem += EVT_MatchSuccessSystem;
@@ -55,8 +55,22 @@ namespace Anonymous.Game.UiUx
         {
             GameEventSystem.EVT_MovementSuccessSystem -= EvtMovementSuccessSystem;
             GameEventSystem.EVT_MatchSuccessSystem -= EVT_MatchSuccessSystem;
-
+            
             isAllChecking = false;
+        }
+
+        public void Retry()
+        {
+            system.EndedApplication();
+
+            var list = system.BlockManagement.ToList();
+            while (list.Count > 0)
+            {
+                list[0].Value.Dispose();
+                list.RemoveAt(0);
+            }
+
+            system.StartedApplication();
         }
 
         private void EvtMovementSuccessSystem()
@@ -65,10 +79,7 @@ namespace Anonymous.Game.UiUx
             uiTextCount.text = $"{system.count}";
 
             if (system.count < 1)
-            {
-                endedApplication = co_endedApplication("Game Over !!");
-                endedApplicationCoroutine = StartCoroutine(endedApplication);
-            }
+                StartCoroutine(co_endedApplication("Game Over !!"));
         }
 
         private void EVT_MatchSuccessSystem(int score)
@@ -100,7 +111,7 @@ namespace Anonymous.Game.UiUx
             while (isAllChecking)
             {
                 isAllChecking = false;
-                
+
                 yield return co_waitSpawn();
                 yield return co_waitInteractable();
             }
@@ -108,7 +119,7 @@ namespace Anonymous.Game.UiUx
             var go = Instantiate(popupGameObject);
             go.GetComponent<PopupSystem>().Setup(message);
 
-            GameSystem.Default.EndedApplication();
+            system.EndedApplication();
         }
     }
 }

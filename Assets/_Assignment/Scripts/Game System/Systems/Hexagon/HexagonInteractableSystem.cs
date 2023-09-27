@@ -56,52 +56,38 @@ namespace Anonymous.Game.Hexagon
 
         private IEnumerator co_interactableTarget()
         {
-            var processEnd = true;
-            while (processEnd)
+            IHexagon target = null;
+            while (target == null || target.block?.id == hexagon.block?.id)
             {
-                yield return null;
-
                 var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
                 var raycastHit2D = Physics2D.Raycast(ray.origin, ray.direction);
-
-                var target = raycastHit2D.transform.GetComponent<IHexagon>();
-                if (target?.block?.id == hexagon?.block?.id)
-                    continue;
-
-                if (target?.block == null || hexagon?.block == null)
-                    continue;
-
-                hexagon.EVT_MovementPublish(target.block.id);
-                target.EVT_MovementPublish(hexagon.block.id);
-
-                if (isNotMatched != null)
-                    StopCoroutine(isNotMatched);
-                isNotMatched = StartCoroutine(co_isNotMatched(hexagon, target));
                 
-                processEnd = false;
+                target = raycastHit2D.transform.GetComponent<IHexagon>();
+                yield return null;
             }
+            
+            if (isNotMatched != null)
+                StopCoroutine(isNotMatched);
+            isNotMatched = StartCoroutine(co_isNotMatched(hexagon, target));
+                
+            hexagon.EVT_MovementPublish(target.block.id);
+            target.EVT_MovementPublish(hexagon.block.id);
         }
 
         private IEnumerator co_isNotMatched(IHexagon current, IHexagon target)
         {
-            while (true)
-            {
+            while (system.isNotMatchedArray.Count < 2)
                 yield return null;
+            
+            var result = true;
+            foreach (var _ in system.isNotMatchedArray.Where(notMatched => !notMatched))
+                result = false;
 
-                if (system.isNotMatchedArray.Count < 2)
-                    continue;
-
-                var result = true;
-                foreach (var _ in system.isNotMatchedArray.Where(notMatched => !notMatched))
-                    result = false;
-
-                if (!result)
-                    continue;
-                
-                current.EVT_MovementPublish(target.block.id);
-                target.EVT_MovementPublish(current.block.id);
-                break;
-            }
+            if (!result)
+                yield break;
+            
+            current.EVT_MovementPublish(target.block.id);
+            target.EVT_MovementPublish(current.block.id);
         }
     }
 }

@@ -55,7 +55,8 @@ namespace Anonymous.Game.Block
             system.isMovementArray.Add(block.id);
             while (Vector2.Distance(transform.localPosition, Vector2.zero) > 0)
             {
-                transform.localPosition = Vector2.MoveTowards(transform.localPosition, Vector2.zero,
+                transform.localPosition = Vector2.MoveTowards(transform.localPosition, 
+                    Vector2.zero,
                     animationSpeed * Time.deltaTime);
                 yield return null;
             }

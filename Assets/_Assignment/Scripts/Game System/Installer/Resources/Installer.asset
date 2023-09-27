@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9c8200cc1e1d2eb4ebb828b7fa98f48a, type: 3}
   m_Name: Installer
   m_EditorClassIdentifier: 
-  MoveCount: 1
+  MoveCount: 20
   MaxScore: 2000

@@ -19,6 +19,7 @@ namespace Anonymous.Game
         [SerializeField] private float spawnTime;
 
         public Dictionary<int, IBlock> BlockManagement = new();
+        public int HexagonCount;
         
         private Coroutine co_spawn;
         private int index;

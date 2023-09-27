@@ -37,6 +37,8 @@ namespace Anonymous.Game.Hexagon
             var hexagonSystems = GetComponentsInChildren<IHexagonSystem>(true);
             foreach (var hexagonSystem in hexagonSystems)
                 hexagonSystem.Setup(this);
+
+            GameSystem.Default.HexagonCount += 1;
         }
 
         public void Teardown()
@@ -45,6 +47,7 @@ namespace Anonymous.Game.Hexagon
             foreach (var hexagonSystem in hexagonSystems)
                 hexagonSystem.Teardown();
 
+            GameSystem.Default.HexagonCount -= 1;
             block = null;
         }
     }

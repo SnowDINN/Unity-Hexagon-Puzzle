@@ -6,11 +6,22 @@ namespace Anonymous.Game.Hexagon
 {
     public class HexagonInteractableSystem : MonoBehaviour, IHexagonSystem
     {
+        private IHexagon hexagon;
         private Coroutine interactableTarget;
         private Coroutine isNotMatched;
-        private IHexagon hexagon;
 
         private GameSystem system => GameSystem.Default;
+
+        private void OnMouseDown()
+        {
+            if (system.count > 0)
+                update_interactable();
+        }
+
+        private void OnMouseUp()
+        {
+            stop_interactable();
+        }
 
         public void Setup(IHexagon hexagon)
         {
@@ -21,26 +32,16 @@ namespace Anonymous.Game.Hexagon
         {
             if (interactableTarget != null)
                 StopCoroutine(interactableTarget);
-            
+
             if (isNotMatched != null)
                 StopCoroutine(isNotMatched);
         }
-        
-        private void OnMouseDown()
-        {
-            update_interactable();
-        }
 
-        private void OnMouseUp()
-        {
-            stop_interactable();
-        }
-        
         private void update_interactable()
         {
             if (!system.canInteractable)
                 return;
-            
+
             system.isNotMatchedArray.Clear();
 
             if (interactableTarget != null)
@@ -61,7 +62,7 @@ namespace Anonymous.Game.Hexagon
             {
                 var ray = Camera.main.ScreenPointToRay(Input.mousePosition);
                 var raycastHit2D = Physics2D.Raycast(ray.origin, ray.direction);
-                
+
                 target = raycastHit2D.transform.GetComponent<IHexagon>();
                 yield return null;
             }
@@ -69,10 +70,13 @@ namespace Anonymous.Game.Hexagon
             if (isNotMatched != null)
                 StopCoroutine(isNotMatched);
             isNotMatched = StartCoroutine(co_isNotMatched(hexagon, target));
-                
-            hexagon.EVT_MovementPublish(target.block.id);
-            target.EVT_MovementPublish(hexagon.block.id);
-            
+
+            if (target.block?.id > 0 && hexagon.block?.id > 0)
+            {
+                hexagon.EVT_MovementPublish(target.block.id);
+                target.EVT_MovementPublish(hexagon.block.id);
+            }
+
             GameEventSystem.EVT_MovementSuccessPublish();
         }
 
@@ -80,14 +84,14 @@ namespace Anonymous.Game.Hexagon
         {
             while (system.isNotMatchedArray.Count < 2)
                 yield return null;
-            
+
             var result = true;
             foreach (var _ in system.isNotMatchedArray.Where(notMatched => !notMatched))
                 result = false;
 
             if (!result)
                 yield break;
-            
+
             current.EVT_MovementPublish(target.block.id);
             target.EVT_MovementPublish(current.block.id);
         }

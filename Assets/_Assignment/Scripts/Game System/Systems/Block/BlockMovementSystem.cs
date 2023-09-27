@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Linq;
 using Anonymous.Game.Hexagon;
 using UnityEngine;
 
@@ -8,10 +9,11 @@ namespace Anonymous.Game.Block
     {
         [Header("Movement Animation Field")] [SerializeField]
         private float animationSpeed;
-        
-        private Coroutine movementBlock;
+
         private IBlock block;
-        
+
+        private Coroutine movementBlock;
+
         private GameSystem system => GameSystem.Default;
 
         public void Setup(IBlock block)
@@ -24,7 +26,7 @@ namespace Anonymous.Game.Block
         public void Teardown()
         {
             GameEventSystem.EVT_MovementSystem -= EVT_MovementSystem;
-            
+
             if (movementBlock != null)
                 StopCoroutine(movementBlock);
         }
@@ -52,25 +54,23 @@ namespace Anonymous.Game.Block
 
         private IEnumerator co_movementBlock(IBlock block, IHexagon hexagon)
         {
-            var time = 0f;
+            var id = block.id;
 
-
-            system.isMovementArray.Add(block.id);
+            system.isMovementArray.Add(id);
             while (Vector2.Distance(transform.localPosition, Vector2.zero) > 0)
             {
-                transform.localPosition = Vector2.MoveTowards(transform.localPosition, 
+                transform.localPosition = Vector2.MoveTowards(transform.localPosition,
                     Vector2.zero,
                     animationSpeed * Time.deltaTime);
                 yield return null;
             }
+            system.isMovementArray.Remove(id);
 
             hexagon.BindBlock(block);
 
-            if (!system.isMovementArray.Remove(block.id))
-                yield break;
-
             GameEventSystem.EVT_DetectBlankSystemPublish();
-            GameEventSystem.EVT_MatchPublish(block.id);
+            GameEventSystem.EVT_MatchPublish(id);
+
         }
     }
 }

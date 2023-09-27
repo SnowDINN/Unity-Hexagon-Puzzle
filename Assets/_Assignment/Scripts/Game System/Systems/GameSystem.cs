@@ -13,6 +13,8 @@ namespace Anonymous.Game
         [HideInInspector] public List<bool> isNotMatchedArray = new();
         [HideInInspector] public List<int> isMovementArray = new();
         [HideInInspector] public Installer.Installer installer;
+        [HideInInspector] public int score;
+        [HideInInspector] public int count;
 
         public readonly Dictionary<BlockType, List<List<IBlock>>> matchTypes = new();
         public bool canInteractable => isMovementArray.Count <= 0;
